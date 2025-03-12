@@ -1,12 +1,10 @@
 <script lang="ts">
-
-
-
 	import { debounce } from '$lib/debounce';
 	import { fetchCelebritySuggestions, type WikidataSearchResult } from '$lib/predictiveSearch';
 	import { fetchCelebrityData, type CelebrityResult } from '$lib/celebrityStatus';
 
-	let celebrityNames = $state<string[]>(['']);
+	let celebrityNames = $state(['']);
+	let isLoading = $state(false);
 	let results = $state<CelebrityResult[]>([]);
 	let disambiguationChoices = $state<Record<string, string[]>>({});
 	let selectedDisambiguations = $state<Record<string, string>>({});
@@ -28,15 +26,21 @@
 		disambiguationChoices = {};
 		selectedDisambiguations = {};
 
-		for (const name of celebrityNames) {
-			if (name.trim()) {
-				const result = await fetchCelebrityData(name.trim());
-				if (result.disambiguation) {
-					disambiguationChoices[name] = result.disambiguation;
-				} else {
-					results.push(result);
+		try {
+			isLoading = true;
+			for (const name of celebrityNames) {
+				if (name.trim()) {
+					const result = await fetchCelebrityData(name.trim());
+					if (result.disambiguation) {
+						disambiguationChoices[name] = result.disambiguation;
+					} else {
+						results.push(result);
+					}
 				}
 			}
+			isLoading = false;
+		} catch (error) {
+			isLoading = false;
 		}
 	}
 
@@ -77,11 +81,15 @@
 		<div class="input-group">
 			<input
 				type="text"
+				disabled={isLoading}
 				bind:value={celebrityNames[index]}
 				placeholder="Enter celebrity name"
 				oninput={(e) => handleInput(index, e?.target.value)}
 			/>
-			<button onclick={() => removeInput(index)} disabled={celebrityNames.length === 1}>
+			<button
+				onclick={() => removeInput(index)}
+				disabled={celebrityNames.length === 1 || isLoading}
+			>
 				Remove
 			</button>
 			{#if suggestions[index]?.length}
@@ -98,8 +106,8 @@
 	{/each}
 
 	<div class="actions">
-		<button onclick={addInput}>Add Another Celebrity</button>
-		<button onclick={checkCelebrities} disabled={celebrityNames.join().trim() === ''}
+		<button disabled={isLoading} onclick={addInput}>Add Another Celebrity</button>
+		<button disabled={isLoading || celebrityNames.join().trim() === ''} onclick={checkCelebrities}
 			>Check Status</button
 		>
 	</div>
