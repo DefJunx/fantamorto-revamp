@@ -2,6 +2,7 @@
 	import { debounce } from '$lib/debounce';
 	import { fetchCelebritySuggestions, type WikidataSearchResult } from '$lib/predictiveSearch';
 	import { fetchCelebrityData, type CelebrityResult } from '$lib/celebrityStatus';
+	import type { ChangeEventHandler } from 'svelte/elements';
 
 	let celebrityNames = $state(['']);
 	let isLoading = $state(false);
@@ -73,10 +74,42 @@
 		celebrityNames[index] = suggestion.label;
 		delete suggestions[index];
 	}
+
+	function handleFileLoading(e: Event) {
+		const files = (e.currentTarget as HTMLInputElement).files;
+
+		if (!files) {
+			alert('file non caricato!');
+			return false;
+		}
+
+		const reader = new FileReader();
+
+		reader.onload = function (e) {
+			const deathList = e.target?.result;
+
+			if (deathList && typeof deathList == 'string') {
+				celebrityNames = deathList.split('\n').map((el) => el.trim());
+				return true;
+			}
+
+			alert('lista invalida, controlla che sia nel formato corretto!');
+			return false;
+		};
+
+		reader.readAsText(files[0]);
+	}
 </script>
 
 <main>
-	<h1>Celebrity Status Checker</h1>
+	<h1>Ma è morto?!</h1>
+	<h2>
+		Carica una lista di nomi (Un nome singolo per ogni riga) oppure scrivi i nomi nei campi
+		sottostanti e premi controlla per verificare se il tuo vip è morto o meno!
+	</h2>
+
+	<input type="file" name="" id="" accept=".txt" onchange={handleFileLoading} />
+
 	{#each celebrityNames as name, index}
 		<div class="input-group">
 			<input
@@ -84,7 +117,7 @@
 				disabled={isLoading}
 				bind:value={celebrityNames[index]}
 				placeholder="Enter celebrity name"
-				oninput={(e) => handleInput(index, e?.target.value)}
+				oninput={(e) => handleInput(index, (e.target as HTMLInputElement)?.value)}
 			/>
 			<button
 				onclick={() => removeInput(index)}
