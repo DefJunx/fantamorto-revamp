@@ -1,4 +1,7 @@
 <script lang="ts">
+
+
+
 	import { debounce } from '$lib/debounce';
 	import { fetchCelebritySuggestions, type WikidataSearchResult } from '$lib/predictiveSearch';
 	import { fetchCelebrityData, type CelebrityResult } from '$lib/celebrityStatus';
@@ -93,8 +96,13 @@
 			{/if}
 		</div>
 	{/each}
-	<button onclick={addInput}>Add Another Celebrity</button>
-	<button onclick={checkCelebrities}>Check Status</button>
+
+	<div class="actions">
+		<button onclick={addInput}>Add Another Celebrity</button>
+		<button onclick={checkCelebrities} disabled={celebrityNames.join().trim() === ''}
+			>Check Status</button
+		>
+	</div>
 
 	{#if Object.keys(disambiguationChoices).length > 0}
 		<h2>Disambiguation Choices</h2>
@@ -116,7 +124,7 @@
 
 	{#if results.length > 0}
 		<h2>Results</h2>
-		<ul>
+		<ul role="list">
 			{#each results as result}
 				<li>
 					{result.name}: {result.error ? result.error : result.deceased ? 'Deceased' : 'Alive'}
@@ -125,41 +133,3 @@
 		</ul>
 	{/if}
 </main>
-
-<style>
-	main {
-		max-width: 600px;
-		margin: 0 auto;
-		padding: 1rem;
-		text-align: center;
-	}
-	.input-group {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		margin-bottom: 0.5rem;
-	}
-	input {
-		width: 100%;
-		padding: 0.5rem;
-		font-size: 1rem;
-	}
-	button {
-		margin-top: 0.5rem;
-		padding: 0.5rem 1rem;
-		font-size: 1rem;
-	}
-	.suggestions {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		background: white;
-		border: 1px solid #ccc;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		z-index: 10;
-	}
-</style>
