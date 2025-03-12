@@ -105,7 +105,7 @@
 	<h1>Ma è morto?!</h1>
 	<h2>
 		Carica una lista di nomi (Un nome singolo per ogni riga) oppure scrivi i nomi nei campi
-		sottostanti e premi controlla per verificare se il tuo vip è morto o meno!
+		sottostanti e premi "Verifica Loculi" per verificare se il tuo vip è morto o meno!
 	</h2>
 
 	<input type="file" name="" id="" accept=".txt" onchange={handleFileLoading} />
@@ -139,17 +139,17 @@
 	{/each}
 
 	<div class="actions">
-		<button disabled={isLoading} onclick={addInput}>Add Another Celebrity</button>
+		<button disabled={isLoading} onclick={addInput}>Aggiungi nome</button>
 		<button disabled={isLoading || celebrityNames.join().trim() === ''} onclick={checkCelebrities}
-			>Check Status</button
+			>Verifica Loculi</button
 		>
 	</div>
 
 	{#if Object.keys(disambiguationChoices).length > 0}
-		<h2>Disambiguation Choices</h2>
+		<h2>Risultati ambigui</h2>
 		{#each Object.entries(disambiguationChoices) as [originalName, choices]}
 			<div>
-				<p>Multiple matches found for "{originalName}". Please select the correct one:</p>
+				<p>Ci sono risultati per"{originalName}". seleziona uno:</p>
 				<ul>
 					{#each choices as choice}
 						<li>
@@ -164,11 +164,11 @@
 	{/if}
 
 	{#if results.length > 0}
-		<h2>Results</h2>
+		<h2>Cimitero:</h2>
 		<ul role="list">
 			{#each results as result}
 				<li>
-					{result.name}: {result.error ? result.error : result.deceased ? 'Deceased' : 'Alive'}
+					{result.name}: {result.error ? result.error : result.deceased ? '🪦' : '😊'}
 				</li>
 			{/each}
 		</ul>
