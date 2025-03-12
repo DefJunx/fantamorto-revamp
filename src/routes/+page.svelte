@@ -123,7 +123,7 @@
 				onclick={() => removeInput(index)}
 				disabled={celebrityNames.length === 1 || isLoading}
 			>
-				Remove
+				Rimuovi
 			</button>
 			{#if suggestions[index]?.length}
 				<ul class="suggestions">
